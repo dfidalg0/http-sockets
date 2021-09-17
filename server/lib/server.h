@@ -3,10 +3,11 @@
 
 #include <string>
 #include <thread>
+#include <functional>
 #include <http-request.h>
 #include <http-response.h>
 
-typedef void (*RequestHandler)(HttpRequest &, HttpResponse &);
+typedef std::function<void(HttpRequest &, HttpResponse &)> RequestHandler;
 
 class HttpServer {
 private:
