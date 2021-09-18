@@ -3,6 +3,7 @@
 #include <algorithm>
 #include <sstream>
 #include <iostream>
+#include <regex>
 
 #include <http-request.h>
 #include <bad-request.h>
@@ -25,6 +26,7 @@ HttpRequest::HttpRequest(int conn) {
 
     // Variáveis auxiliares para percorrer o buffer de leitura
     unsigned i, j, n_bytes;
+    std::smatch results;
 
     // stream de leitura para as linhas da resposta
     std::stringstream read_stream;
@@ -69,16 +71,15 @@ HttpRequest::HttpRequest(int conn) {
             if (read_status == FIRST_LINE) {
                 // No caso de ser a primeira linha, devemos extrair o método,
                 // o path e a versão do HTTP
-                int index = line.find(' ');
-                _method = line.substr(0, index);
 
-                line = line.substr(index + 1);
-                index = line.find(' ');
-                _path = line.substr(0, index);
+                // Checagem se a primeira linha está no formado esperado
+                if(!std::regex_match(line, results, std::regex("^([A-Z]+) ((?:\\/[^\\/]+)+\\/?) HTTP/(\\d+(\\.\\d+)?)\\r\\n$")))
+                    throw BadRequestException();
 
-                line = line.substr(index + 1);
-                index = line.find('/');
-                _version = std::stod(line.substr(index + 1));
+                // Se o formato estiver correto, salvar os grupos de busca nas variáveis
+                _method = results[1];
+                _path = results[2];
+                _version = std::stod(results[3]);
 
                 // E avançar para o próximo estado
                 read_status = HEADERS;
@@ -87,24 +88,13 @@ HttpRequest::HttpRequest(int conn) {
                 // Se chegamos aqui, o estado com certeza é HEADERS e a linha
                 // não começa com um '\r', portanto, estamos lendo um header
 
-                // Assim, devemos separar dividir as informações da linha
+                // Checagem se as linhas de header estão no formato esperado
+                if(!std::regex_match(line, results, std::regex("^([A-Za-z-]+): +([^\\r\\n]+)\\r\\n$")))
+                    throw BadRequestException();
 
-                // Primeiro, obtemos o índice do separador ':'
-                const int sep_idx = line.find(':');
-
-                // Depois, a posição onde se inicia o valor do header
-                int value_begin_idx = sep_idx + 1;
-                while (line[value_begin_idx] == ' ') ++value_begin_idx;
-
-                // E, por fim, a posição onde se encerra o valor do header
-                const int value_end_idx = line.rfind('\r');
-
-                // Assim, quebramos a linha nas posições desejadas
-                auto name = line.substr(0, sep_idx);
-
-                auto value = line.substr(
-                    value_begin_idx,
-                    value_end_idx - value_begin_idx);
+                // Se o formato estiver correto, salvar os grupos de busca nas variáveis
+                std::string name = results[1];
+                std::string value = results[2];
 
                 // No entanto, é importante normalizar o nome do header,
                 // pois estes são case-insensitive
