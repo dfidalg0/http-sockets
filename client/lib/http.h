@@ -1,13 +1,13 @@
 #ifndef __HTTP__
 #define __HTTP__
 
-#include <sstream>
 #include <unordered_map>
-
-#define BUFF_SIZE 4096
+#include <string>
 
 class HttpResponse {
 private:
+    static const uint BUFF_SIZE = 4096;
+
     int _status;
     std::string _path;
     int content_length;

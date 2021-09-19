@@ -1,11 +1,9 @@
 #include <unistd.h>
-#include <string.h>
-#include <cctype>
-#include <iostream>
 #include <algorithm>
+#include <sstream>
 
-#include "http.h"
-#include "utils.h"
+#include <http.h>
+#include <utils.h>
 
 enum ReadStatus {
     FIRST_LINE,
@@ -134,10 +132,15 @@ HttpResponse::HttpResponse(int sock, std::string path) {
 
     // Ao finalizar a leitura, certamente devemos ter algum pedaço do corpo da
     // resposta armazenado no buffer. Tratemos de alocar esse valor no início
-    strcpy(buffer, buffer + i);
 
-    // E registrar o número de bytes do corpo que já está armazenado no buffer
+    // Para isso, armazenamos o número de bytes que já estão no buffer
     bytes_buffered = n_bytes - i;
+
+    // E, em seguida, copiamos os bytes para o início.
+    // É EXTREMAMENTE importante que a operação seja feita NESSA ORDEM
+    for (int j = 0; j < bytes_buffered; ++j) {
+        buffer[j] = buffer[j + i];
+    }
 }
 
 int HttpResponse::status() {

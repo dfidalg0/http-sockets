@@ -1,8 +1,6 @@
 #include <sys/unistd.h>
-#include <string.h>
 #include <algorithm>
 #include <sstream>
-#include <iostream>
 #include <regex>
 
 #include <http-request.h>
@@ -73,7 +71,7 @@ HttpRequest::HttpRequest(int conn) {
                 // o path e a versão do HTTP
 
                 // Checagem se a primeira linha está no formado esperado
-                if(!std::regex_match(line, results, std::regex("^([A-Z]+) ((?:\\/[^\\/]+)+\\/?) HTTP/(\\d+(\\.\\d+)?)\\r\\n$")))
+                if(!std::regex_match(line, results, std::regex("^([A-Z]+) ((?:\\/[^\\/]+)+)\\/? HTTP/(\\d+(\\.\\d+)?)\\r\\n$")))
                     throw BadRequestException();
 
                 // Se o formato estiver correto, salvar os grupos de busca nas variáveis
@@ -132,10 +130,15 @@ HttpRequest::HttpRequest(int conn) {
 
     // Ao finalizar a leitura, certamente devemos ter algum pedaço do corpo da
     // resposta armazenado no buffer. Tratemos de alocar esse valor no início
-    strcpy(buffer, buffer + i);
 
-    // E registrar o número de bytes do corpo que já está armazenado no buffer
+    // Para isso, armazenamos o número de bytes que já estão no buffer
     bytes_buffered = n_bytes - i;
+
+    // E, em seguida, copiamos os bytes para o início.
+    // É EXTREMAMENTE importante que a operação seja feita NESSA ORDEM
+    for (int j = 0; j < bytes_buffered; ++j) {
+        buffer[j] = buffer[j + i];
+    }
 }
 
 std::string HttpRequest::path() {
