@@ -1,39 +1,59 @@
-#Lab1 - CES-35
-Alunos:
-Diego Teixeira Nogueira Fidalgo
-Pedro Henrique Freitas Silva
+# Lab1 - CES-35 - Sockets HTTP
 
-Estão inclusas as pastas server, client e bin que contém:
+- Diego Teixeira Nogueira Fidalgo
+- Pedro Henrique Freitas Silva
 
-server:
--http-request.cpp/.h
--http-response.cpp/.h
--server.cpp/.h
--bad-request.h
--main.cpp
+## Estrutura de arquivos
 
-client:
--http.cpp/.h
--request.cpp/.h
--utils.cpp/.h
--main.cpp
+Estão inclusas as pastas server e client que contém:
 
-bin:
--Contém os executáveis de client and server
+- server
+  - http-request.cpp/.h
+  - http-response.cpp/.h
+  - server.cpp/.h
+  - bad-request.h
+  - main.cpp
 
-Se for necessário compilar os arquivos, basta usar o comando 
+- client
+  - http.cpp/.h
+  - request.cpp/.h
+  - utils.cpp/.h
+  - main.cpp
+
+## Compilação
+
+Para compilar os arquivos, basta usar o comando
+
+```bash
+$ make
 ```
-$ make 
-```
-em uma pasta que contém todos os arquivos.
 
-Para executar o server, basta usar o comando
+ou, para compilar um dos executáveis individualmente,
+
+```bash
+$ make [client|server]
 ```
+
+Todos os executáveis são salvos na pasta `bin` na raiz do projeto.
+
+## Utilização
+
+Para executar o servidor, basta usar o comando
+
+```bash
 $ ./bin/server [host] [port] [dir]
 ```
 
-Para executar o client, basta usar o comando
-```
-$ ./bin/server [URL]
+Para executar o cliente, basta usar o comando
+
+```bash
+$ ./bin/client [URL]
 ```
 
+## Limpeza
+
+Para apagar todos os arquivos compilados, basta usar o comando
+
+```bash
+$ make clean
+```
