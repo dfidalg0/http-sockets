@@ -38,7 +38,9 @@ HttpRequest::HttpRequest(int conn) {
         n_bytes = ::read(conn, buffer, BUFF_SIZE);
 
         // Teste de fim de leitura
-        if (n_bytes <= 0) break;
+        if (n_bytes <= 0) {
+            throw BadRequestException();
+        }
 
         // Loop interno - processa cada linha da resposta individualmente
         while (read_status != BODY) {

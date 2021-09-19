@@ -30,7 +30,12 @@ int main(int argc, char const * argv[]) {
         auto filepath = path / fs::path(req.path());
 
         if (!fs::is_regular_file(filepath)) {
-            res << "HTTP/" << req.version() << " 404 Not Found\r\n\r\n";
+            res
+                << "HTTP/" << req.version() << " 404 Not Found\r\n"
+                << "Content-Type: text/plain\r\n"
+                << "\r\n"
+                << "File not found\n";
+
             return;
         }
 
