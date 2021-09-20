@@ -20,13 +20,40 @@ private:
 
     char buffer[BUFF_SIZE];
 public:
+    /**
+     * Construtor da classe HttpRequest
+     *
+     * @param conn ID do descritor de arquivo da conexão TCP
+     */
     HttpRequest(int conn);
 
+    /**
+     * @returns Caminho solicitado na requisição
+     */
     std::string path();
-    std::string method();
-    double version();
-    std::string header(std::string _name);
 
+    /**
+     * @returns Método da requisição HTTP
+     */
+    std::string method();
+
+    /**
+     * @returns Versão do protocólo HTTP utilizada pela requisição
+     */
+    double version();
+
+    /**
+     * @param name Nome do header buscado
+     * @returns Valor do header pedido ou string vazia caso este não exista
+     */
+    std::string header(std::string name);
+
+    /**
+     * Obtém uma parcela do corpo da requisição
+     * @param stream Stream de escrita onde será salvo o resultado da leitura
+     *
+     * @returns Número de bytes transmitido para a stream ou -1 em caso de EOF
+     */
     int read(std::ostream& stream);
 };
 
